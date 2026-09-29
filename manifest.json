@@ -1,0 +1,13 @@
+{
+  "name": "每日一笑",
+  "short_name": "每日一笑",
+  "description": "每天一条笑话，可以用你喜欢的声音讲出来",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#f97316",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
