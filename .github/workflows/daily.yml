@@ -1,10 +1,10 @@
 name: 今日一笑
 
-# 每天自动生成并推送「今日一笑」，不依赖本地电脑：
-#   Actions（编排）→ Worker（挑段子 + 合成音频）→ 提交 data/featured.json 与 audio/*.mp3
+# 每天自动生成并推送「今日一笑」，并把 App 里收藏的段子固化进仓库 —— 不依赖本地电脑。
+#   Actions（编排）→ Worker（挑段子 / 合成音频 / 收藏快照）→ 提交数据文件
 #
 # 为什么不需要构建前端：页面是静态的，数据是运行时 fetch 的
-# （data/featured.json 带 ?t= 防缓存、音频带 ?v=updatedAt），所以只需提交这两个文件。
+# （data/featured.json 带 ?t= 防缓存、音频带 ?v=updatedAt），所以只需提交数据文件。
 #
 # 零配置：/daily/pick 是**按日期幂等**的，同一天重复调用返回同一条段子，
 # 所以它没有可滥用面（别人最多提前触发今天本来就要挑的那条），默认不需要任何 token。
@@ -14,7 +14,7 @@ on:
   schedule:
     # 08:07 北京时间 = 00:07 UTC。GitHub 的定时任务在高峰期可能延迟几分钟到半小时。
     - cron: '7 0 * * *'
-  workflow_dispatch: # 也可以在 Actions 页面手动点一次
+  workflow_dispatch: # 也可以在 Actions 页面手动点一次（例如想立刻固化刚收藏的段子）
 
 permissions:
   contents: write # 需要把生成的数据提交回仓库
@@ -39,30 +39,24 @@ jobs:
           curl -sS -X POST "$WORKER/refresh?limit=10" -o refresh.json
           head -c 400 refresh.json || true
 
+      # 收藏的段子必须留住：Worker 里存的是完整快照（含正文），这里把它固化进仓库。
+      # 只增不减：已存在的 id 不动、绝不删除、绝不重排（失败也不阻塞下面的今日一笑）。
+      - name: 把收藏的段子固化进仓库（只增不减）
+        continue-on-error: true
+        run: |
+          curl -fsS "$WORKER/favorites" -o favorites.json
+          python3 .github/scripts/daily.py favorites favorites.json data/jokes.json
+
       - name: 挑一条今天的段子
         id: pick
         run: |
           curl -fsS "$WORKER/daily/pick?token=${{ secrets.DAILY_TOKEN }}" -o pick.json
           cat pick.json
-          # 挑不到时 Worker 返回 { error }，要明确失败而不是带着空值往下走
-          jq -e '.ok and .id and .audioRel' pick.json > /dev/null || { echo "挑段子失败"; exit 1; }
-          {
-            echo "id=$(jq -r .id pick.json)"
-            echo "date=$(jq -r .date pick.json)"
-            echo "audio=$(jq -r .audioRel pick.json)"
-            echo "vcn=$(jq -r .vcn pick.json)"
-          } >> "$GITHUB_OUTPUT"
+          # 字段不全时这个脚本会非零退出，不会带着空值往下走
+          python3 .github/scripts/daily.py outputs pick.json >> "$GITHUB_OUTPUT"
 
       - name: 写入 data/featured.json
-        run: |
-          jq '{
-            date: .date,
-            joke: { id: .id, text: .text, category: .category, source: .source, date: .date },
-            audio: .audioRel,
-            voiceName: .voiceName,
-            updatedAt: (now * 1000 | floor)
-          }' pick.json > data/featured.json
-          cat data/featured.json
+        run: python3 .github/scripts/daily.py featured pick.json data/featured.json
 
       - name: 合成音频
         run: |
@@ -78,20 +72,30 @@ jobs:
 
       - name: 清掉同一天的旧音频
         run: |
-          YMD=$(echo '${{ steps.pick.outputs.date }}' | tr -d '-')
+          D='${{ steps.pick.outputs.date }}'
+          # 保险：日期为空时直接跳过，否则通配符会退化成 daily-*.mp3 把所有音频删光
+          [ -n "$D" ] || { echo "没有日期，跳过清理"; exit 0; }
+          YMD=$(echo "$D" | tr -d '-')
           NEW=$(basename '${{ steps.pick.outputs.audio }}')
-          # 注意通配符里**不能**写成 daily-$YMD-*.mp3：那样漏掉早期命名 daily-<ymd>.mp3
-          # （没有 id 与时间戳后缀），旧文件会一直留在仓库里。
+          # 注意通配符里**不能**写成 daily-$YMD-*.mp3：那样会漏掉早期命名 daily-<ymd>.mp3
           find audio -name "daily-$YMD*.mp3" ! -name "$NEW" -print -delete || true
 
+      # 用 always()：即使今天挑段子/合成失败，也要把已取到的收藏固化进仓库
       - name: 提交并推送
+        if: always()
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/featured.json audio
+          git add data/featured.json data/jokes.json audio
           if git diff --cached --quiet; then
             echo "没有变化，跳过提交"
             exit 0
           fi
-          git commit -m "今日一笑 ${{ steps.pick.outputs.date }} (${{ steps.pick.outputs.id }})"
+          D='${{ steps.pick.outputs.date }}'
+          I='${{ steps.pick.outputs.id }}'
+          if [ -n "$D" ] && [ -n "$I" ]; then
+            git commit -m "今日一笑 $D ($I)"
+          else
+            git commit -m "收藏入库 $(date -u +%F)"
+          fi
           git push
