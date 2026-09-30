@@ -1,0 +1,95 @@
+name: 今日一笑
+
+# 每天自动生成并推送「今日一笑」，不依赖本地电脑：
+#   Actions（编排）→ Worker（挑段子 + 合成音频）→ 提交 data/featured.json 与 audio/*.mp3
+#
+# 为什么不需要构建前端：页面是静态的，数据是运行时 fetch 的
+# （data/featured.json 带 ?t= 防缓存、音频带 ?v=updatedAt），所以只需提交这两个文件。
+#
+# 零配置：/daily/pick 是**按日期幂等**的，同一天重复调用返回同一条段子，
+# 所以它没有可滥用面（别人最多提前触发今天本来就要挑的那条），默认不需要任何 token。
+# 想加固就在 Worker 上 `wrangler secret put DAILY_TOKEN`，并在本仓库加一个同名 Secret。
+
+on:
+  schedule:
+    # 08:07 北京时间 = 00:07 UTC。GitHub 的定时任务在高峰期可能延迟几分钟到半小时。
+    - cron: '7 0 * * *'
+  workflow_dispatch: # 也可以在 Actions 页面手动点一次
+
+permissions:
+  contents: write # 需要把生成的数据提交回仓库
+
+# 同一时间只跑一个，避免两次运行互相覆盖
+concurrency:
+  group: daily-joke
+  cancel-in-progress: false
+
+env:
+  WORKER: https://tts.qinxiang2.cn
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 云端先采一批新段子（冷却中或失败都不影响本次推送）
+        continue-on-error: true
+        run: |
+          curl -sS -X POST "$WORKER/refresh?limit=10" -o refresh.json
+          head -c 400 refresh.json || true
+
+      - name: 挑一条今天的段子
+        id: pick
+        run: |
+          curl -fsS "$WORKER/daily/pick?token=${{ secrets.DAILY_TOKEN }}" -o pick.json
+          cat pick.json
+          # 挑不到时 Worker 返回 { error }，要明确失败而不是带着空值往下走
+          jq -e '.ok and .id and .audioRel' pick.json > /dev/null || { echo "挑段子失败"; exit 1; }
+          {
+            echo "id=$(jq -r .id pick.json)"
+            echo "date=$(jq -r .date pick.json)"
+            echo "audio=$(jq -r .audioRel pick.json)"
+            echo "vcn=$(jq -r .vcn pick.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 写入 data/featured.json
+        run: |
+          jq '{
+            date: .date,
+            joke: { id: .id, text: .text, category: .category, source: .source, date: .date },
+            audio: .audioRel,
+            voiceName: .voiceName,
+            updatedAt: (now * 1000 | floor)
+          }' pick.json > data/featured.json
+          cat data/featured.json
+
+      - name: 合成音频
+        run: |
+          AUDIO='${{ steps.pick.outputs.audio }}'
+          mkdir -p "$(dirname "$AUDIO")"
+          # /tts 直接返回 mp3 字节；-f 让上游报错（JSON + 非 2xx）时立即失败
+          curl -fsS "$WORKER/tts?id=${{ steps.pick.outputs.id }}&vcn=${{ steps.pick.outputs.vcn }}" \
+            -H 'accept: audio/mpeg' -o "$AUDIO"
+          SIZE=$(stat -c%s "$AUDIO")
+          echo "音频 $AUDIO = $SIZE 字节"
+          # 太小说明拿到的不是真音频（比如错误 JSON 被 -f 漏过），宁可失败也不要推一条哑的
+          [ "$SIZE" -gt 2000 ] || { echo "音频只有 $SIZE 字节，判定为失败"; head -c 300 "$AUDIO"; exit 1; }
+
+      - name: 清掉同一天的旧音频
+        run: |
+          YMD=$(echo '${{ steps.pick.outputs.date }}' | tr -d '-')
+          NEW=$(basename '${{ steps.pick.outputs.audio }}')
+          find audio -name "daily-$YMD-*.mp3" ! -name "$NEW" -print -delete || true
+
+      - name: 提交并推送
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/featured.json audio
+          if git diff --cached --quiet; then
+            echo "没有变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "今日一笑 ${{ steps.pick.outputs.date }} (${{ steps.pick.outputs.id }})"
+          git push
