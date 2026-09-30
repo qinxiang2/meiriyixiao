@@ -1,0 +1,373 @@
+{
+  "_note": "语言/风格 → 发音人清单。vcn 全部来自 2026-09-30 对账号白名单（142 个）的实测：标「🔒」的是 vcn 合法但没开通许可，去讯飞控制台开通对应发音人后**立刻可用，不用改代码**。加声音只改本文件，然后 python D:\\joke\\deploy.py。",
+  "_source": "实测：worker/probe-report.json；名称参考「超拟人语音合成」文档发音人列表",
+  "languages": [
+    {
+      "id": "cantonese",
+      "name": "粤语",
+      "emoji": "🍵",
+      "desc": "需开通许可",
+      "voices": [
+        {
+          "vcn": "x4_CtnCn_ZiYun_oral",
+          "name": "子云 · 粤语男声",
+          "note": "🔒 需控制台开通"
+        }
+      ]
+    },
+    {
+      "id": "northeast",
+      "name": "东北话",
+      "emoji": "🧧",
+      "desc": "讲段子自带笑点",
+      "voices": [
+        {
+          "vcn": "x4_ziyang_oral",
+          "name": "子阳 · 东北话男声",
+          "note": "🔒 需控制台开通"
+        }
+      ]
+    },
+    {
+      "id": "tianjin",
+      "name": "天津话",
+      "emoji": "🥟",
+      "desc": "相声味儿",
+      "voices": [
+        {
+          "vcn": "x6_tianjingshaonv_pro",
+          "name": "天津少女",
+          "note": "天津味女声"
+        },
+        {
+          "vcn": "x4_zijin_oral",
+          "name": "子津 · 天津话男声",
+          "note": "🔒 需控制台开通"
+        }
+      ]
+    },
+    {
+      "id": "taiwan",
+      "name": "台湾腔",
+      "emoji": "🍍",
+      "voices": [
+        {
+          "vcn": "x6_taiqiangnuannan_pro",
+          "name": "台湾腔温柔男声"
+        }
+      ]
+    },
+    {
+      "id": "foreign",
+      "name": "老外腔",
+      "emoji": "🌍",
+      "voices": [
+        {
+          "vcn": "x6_waiguodashu_pro",
+          "name": "外国大叔",
+          "note": "🔒 外国人说中文"
+        }
+      ]
+    },
+    {
+      "id": "meme",
+      "name": "玩梗口音",
+      "emoji": "😆",
+      "voices": [
+        {
+          "vcn": "x6_xiangruiyingyu_pro",
+          "name": "商务殷语",
+          "note": "玩梗口音"
+        }
+      ]
+    },
+    {
+      "id": "mandarin",
+      "name": "普通话",
+      "emoji": "🀄",
+      "desc": "可用声音最多",
+      "voices": [
+        {
+          "vcn": "x6_lingxiaoxuan_pro",
+          "name": "聆小璇 · 亲和女声",
+          "note": "交互聊天"
+        },
+        {
+          "vcn": "x6_lingfeiyi_pro",
+          "name": "聆飞逸 · 清朗男声",
+          "note": "交互聊天"
+        },
+        {
+          "vcn": "x6_lingxiaoyue_pro",
+          "name": "聆小玥 · 温柔女声",
+          "note": "交互聊天"
+        },
+        {
+          "vcn": "x6_lingyuyan_pro",
+          "name": "聆玉言 · 端庄女声",
+          "note": "交互聊天"
+        },
+        {
+          "vcn": "x5_lingyuzhao_flow",
+          "name": "聆玉昭 · 知性女声",
+          "note": "x5 免费版"
+        },
+        {
+          "vcn": "x5_lingxiaoxuan_flow",
+          "name": "聆小璇 · 经典版",
+          "note": "x5"
+        },
+        {
+          "vcn": "x6_wenroumama_pro",
+          "name": "温柔妈妈",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_lingxiaoluo_pro",
+          "name": "聆小洛"
+        },
+        {
+          "vcn": "x6_lingxiaoyu_pro",
+          "name": "聆小雨"
+        },
+        {
+          "vcn": "x6_lingxiaoyao_pro",
+          "name": "聆小瑶"
+        },
+        {
+          "vcn": "x6_lingxiaowan_pro",
+          "name": "聆小婉"
+        },
+        {
+          "vcn": "x6_lingxiaoxi_pro",
+          "name": "聆小汐"
+        },
+        {
+          "vcn": "x6_lingxiaoshu_pro",
+          "name": "聆小淑"
+        },
+        {
+          "vcn": "x6_lingxiaoshan_pro",
+          "name": "聆小珊",
+          "note": "时政新闻"
+        },
+        {
+          "vcn": "x6_lingyufei_pro",
+          "name": "聆玉菲",
+          "note": "时政新闻"
+        },
+        {
+          "vcn": "x6_lingfeichen_pro",
+          "name": "聆飞辰"
+        },
+        {
+          "vcn": "x6_lingfeiyue_pro",
+          "name": "聆飞玥"
+        },
+        {
+          "vcn": "x6_lingfeihan_pro",
+          "name": "聆飞瀚",
+          "note": "纪录片"
+        },
+        {
+          "vcn": "x6_lingfeihao_pro",
+          "name": "聆飞皓",
+          "note": "广告促销"
+        },
+        {
+          "vcn": "x6_feizheChat_pro",
+          "name": "聆飞哲",
+          "note": "交互聊天"
+        }
+      ]
+    },
+    {
+      "id": "role",
+      "name": "角色扮演",
+      "emoji": "🎭",
+      "voices": [
+        {
+          "vcn": "x6_ruyadashu_pro",
+          "name": "儒雅大叔",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_wumeinv_pro",
+          "name": "妩媚姐姐",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_huajidama_pro",
+          "name": "滑稽大妈",
+          "note": "🔒 角色配音"
+        },
+        {
+          "vcn": "x6_gaolengnanshen_pro",
+          "name": "高冷男神",
+          "note": "🔒 角色配音"
+        },
+        {
+          "vcn": "x6_huoposhaonian_pro",
+          "name": "活泼少年",
+          "note": "🔒 角色配音"
+        },
+        {
+          "vcn": "x6_dongmanshaonv_pro",
+          "name": "动漫少女",
+          "note": "🔒 动漫角色"
+        },
+        {
+          "vcn": "x6_xiaonaigoudidi_mini",
+          "name": "小奶狗弟弟",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_wuyediantai_mini",
+          "name": "午夜电台",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_kongbunvsheng_mini",
+          "name": "恐怖女声",
+          "note": "悬疑恐怖"
+        },
+        {
+          "vcn": "x6_gufengxianv_mini",
+          "name": "古风侠女",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_tiexinnanyou_mini",
+          "name": "贴心男友",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_ganliannvxing_pro",
+          "name": "干练女性",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_lingbosong_pro",
+          "name": "聆伯松",
+          "note": "角色配音"
+        }
+      ]
+    },
+    {
+      "id": "ip",
+      "name": "IP模仿",
+      "emoji": "🤖",
+      "voices": [
+        {
+          "vcn": "x6_huanlemianbao_pro",
+          "name": "海绵宝宝",
+          "note": "IP模仿"
+        },
+        {
+          "vcn": "x6_zuixianlibai_pro",
+          "name": "李白模仿",
+          "note": "🔒 IP模仿"
+        },
+        {
+          "vcn": "x6_dudulibao_pro",
+          "name": "少女可莉",
+          "note": "🔒 IP模仿"
+        },
+        {
+          "vcn": "x6_shiwangxiaoxin_pro",
+          "name": "奶凶辛巴",
+          "note": "🔒 IP模仿"
+        }
+      ]
+    },
+    {
+      "id": "broadcast",
+      "name": "播报腔",
+      "emoji": "📻",
+      "voices": [
+        {
+          "vcn": "x6_pangbainan1_pro",
+          "name": "旁白男声",
+          "note": "旁白配音"
+        },
+        {
+          "vcn": "x6_pangbainv1_pro",
+          "name": "旁白女声",
+          "note": "旁白配音"
+        },
+        {
+          "vcn": "x6_gufengpangbai_pro",
+          "name": "古风旁白",
+          "note": "旁白配音"
+        },
+        {
+          "vcn": "x6_yulexinwennvsheng_mini",
+          "name": "娱乐新闻女声",
+          "note": "娱乐新闻"
+        },
+        {
+          "vcn": "x6_daqixuanchuanpiannansheng_mini",
+          "name": "大气宣传片男声",
+          "note": "广告宣传片"
+        },
+        {
+          "vcn": "x6_jingqudaolannvsheng_mini",
+          "name": "景区导览女声",
+          "note": "景区解说"
+        },
+        {
+          "vcn": "x6_shibingnvsheng_mini",
+          "name": "士兵女声",
+          "note": "角色配音"
+        },
+        {
+          "vcn": "x6_cuishounvsheng_pro",
+          "name": "催收女声",
+          "note": "客服"
+        },
+        {
+          "vcn": "x6_yingxiaonv_pro",
+          "name": "营销女声",
+          "note": "营销客服"
+        },
+        {
+          "vcn": "x6_bokenansheng_pro",
+          "name": "播客男声",
+          "note": "🔒 广播电台"
+        },
+        {
+          "vcn": "x6_zhuanyenanzhuchi_pro",
+          "name": "大会主持男声",
+          "note": "🔒 大会主持"
+        },
+        {
+          "vcn": "x6_zhuanyenvzhuchi_pro",
+          "name": "大会主持女声",
+          "note": "🔒 大会主持"
+        }
+      ]
+    },
+    {
+      "id": "kid",
+      "name": "小朋友",
+      "emoji": "🧸",
+      "voices": [
+        {
+          "vcn": "x6_lingyuaner_pro",
+          "name": "聆园儿",
+          "note": "儿童绘本"
+        },
+        {
+          "vcn": "x6_lingyouyou_pro",
+          "name": "聆佑佑",
+          "note": "🔒 童年女"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "langId": "mandarin",
+    "vcn": "x6_lingxiaoxuan_pro",
+    "speed": 50
+  }
+}
