@@ -80,7 +80,9 @@ jobs:
         run: |
           YMD=$(echo '${{ steps.pick.outputs.date }}' | tr -d '-')
           NEW=$(basename '${{ steps.pick.outputs.audio }}')
-          find audio -name "daily-$YMD-*.mp3" ! -name "$NEW" -print -delete || true
+          # 注意通配符里**不能**写成 daily-$YMD-*.mp3：那样漏掉早期命名 daily-<ymd>.mp3
+          # （没有 id 与时间戳后缀），旧文件会一直留在仓库里。
+          find audio -name "daily-$YMD*.mp3" ! -name "$NEW" -print -delete || true
 
       - name: 提交并推送
         run: |
